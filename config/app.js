@@ -4,7 +4,7 @@ var path = require('path');
 module.exports = function(app) {
   // Configuration for all environments
   app.set('port', process.env.PORT || 3000);
-  app.set('views', __dirname + '/views');
+  app.set('views', __dirname +'/../views');
   app.set('view engine', 'ejs');
   app.use(express.favicon());
   app.use(express.logger('dev'));

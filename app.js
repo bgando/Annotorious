@@ -5,7 +5,7 @@ var http = require('http');
 var app = express();
 
 // Setup app
-var db = require('./config/app')(app);
+var appConfig = require('./config/app')(app);
 
 // Include DB
 var db = require('./config/db')(app);
