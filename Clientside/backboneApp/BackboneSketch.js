@@ -72,15 +72,16 @@ var Works = Backbone.Collection.extend({
 var WorkView = Backbone.View.extend({
   initialize: function(){
     var self = this.model
-    $('a').bind('click', function(button) {
-      console.log(button.value);
+    this.$el.bind('click', function(e) {
+      console.log(self.id);
     });
   },
 
+  tagName: 'a',
 
   template: _.template('<article><%= this.model.escape("_id.ACT1") %></article>'),
 
-  templateTitle: _.template('<li><a href=# value="<%= this.model.escape("_id") %>"><%= this.model.escape("title") %></a></li>'),
+  templateTitle: _.template('<%= this.model.escape("title") %>'),
 
   templateNextAct: _.template('<a href=/works/<%= this.model.escape("_id") %>/<%= this.model.escape("_id.ACT") %>>Next Act</a>'),
 
@@ -120,6 +121,7 @@ var WorksView = Backbone.View.extend({
   addOne: function(work){
     var workView = new WorkView({model: work});
     var titleViewInstance = workView.renderTitle().el;
+    console.log(titleViewInstance);
     this.$el.append(titleViewInstance);
     return this;
   }
