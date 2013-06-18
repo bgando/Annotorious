@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 
-var Play = mongoose.Schema({
+var Schema = mongoose.Schema;
+
+var Play = new Schema({
   TITLE: String,
   // ACT: [Object], // Define this more later if necessary
   // PERSONAE: {

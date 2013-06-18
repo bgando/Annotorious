@@ -6,4 +6,5 @@ module.exports = function(app) {
 
   // Register models
   mongoose.model('Play', require('../schemas/Play'));
+  mongoose.model('Annotation', require('../schemas/Annotation'))
 };

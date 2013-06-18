@@ -38,7 +38,6 @@ var Work = Backbone.Model.extend({
 
   showContent: function(model) {
     var test = this.fetch();
-    console.log('showContent', test);
   }
 
 });
@@ -73,26 +72,31 @@ var WorkView = Backbone.View.extend({
   initialize: function(){
     var self = this.model
     this.$el.bind('click', function(e) {
-      console.log(self.id);
+      self.showContent(self.id);
     });
+    this.model.bind('change', this.renderAll, this);
   },
 
-  tagName: 'a',
 
-  template: _.template('<article><%= this.model.escape("_id.ACT1") %></article>'),
+  template: _.template('<h3><%= this.model.escape("title") %></h3><' + 
+    'article><%= this.model.ACT %></article>'),
 
   templateTitle: _.template('<%= this.model.escape("title") %>'),
 
   templateNextAct: _.template('<a href=/works/<%= this.model.escape("_id") %>/<%= this.model.escape("_id.ACT") %>>Next Act</a>'),
 
-  showContent: function() {
-    this.model.trigger('showContent');
-    console.log("i'm working here");
-  },
+  // showContent: function(id) {
+  //   this.model.trigger('showContent');
+  //   console.log("i'm working here", id);
+  // },
 
   renderAll: function(){
-    this.$el.append(this.template({model: this.model.attributes}));
-    this.$el.append(this.templateNextAct({act: this.collection.act + 1}));
+    var thing =this.$el.append(this.template({model: this.model.attributes}));
+    $('#content').html(thing);
+    // var el = this.template({model: this.model.attributes});
+    // console.log(el);
+    console.log(this.model.attributes);
+    // this.$el.append(this.templateNextAct({act: this.collection.act + 1}));
   },
 
   renderTitle: function() {
@@ -121,7 +125,7 @@ var WorksView = Backbone.View.extend({
   addOne: function(work){
     var workView = new WorkView({model: work});
     var titleViewInstance = workView.renderTitle().el;
-    console.log(titleViewInstance);
+    // console.log(titleViewInstance);
     this.$el.append(titleViewInstance);
     return this;
   }
