@@ -5,6 +5,7 @@ var WorkView = Backbone.View.extend({
      //  console.log(act);
      // }); %>'),
 
+  // templateTitle: _.template('<%= this.model.escape("title") %>'),
   templateTitle: _.template('<%= this.model.escape("title") %>'),
   templateNextAct: _.template('<a href=/works/<%= this.model.escape("_id") %>/<%= this.model.escape("_id.ACT") %>>Next Act</a>'),
 
