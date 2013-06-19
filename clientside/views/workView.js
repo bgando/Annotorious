@@ -1,20 +1,25 @@
 var WorkView = Backbone.View.extend({
   events: {
-    'click': "renderAll"
+    'click.titleNav': "renderActs",
+    'click.scene' : "renderAct"
   },
 
-  templateAll: Handlebars.compile(
+  templateActs: Handlebars.compile(
     '<h3>{{ title }}</h3>' + 
     '<article>{{#each ACT}}{{>act}}{{/each}}</article>'
   ),
 
-  templateTitle: Handlebars.compile('{{ title }}'),
+  // templateAct: Handlebars.compile(
+
+  // ),
+
+  templateTitle: Handlebars.compile('<a class="titleNav">{{ title }}</a>'),
   templateNextAct: Handlebars.compile('<a href=/works/{{ _id }}/{{ ACT }} Next Act</a>'),
 
-  renderAll: function(){
+  renderActs: function(){
     var model = this.model.fetch({
       success: function(model, response, options) {    
-        $('#content').html(this.templateAll(this.model.toJSON()));
+        $('#content').html(this.templateActs(this.model.toJSON()));
       }.bind(this)
     });
     // this.$el.append(this.templateNextAct({act: this.collection.act + 1}));
@@ -29,7 +34,7 @@ var WorkView = Backbone.View.extend({
 
 // Partial: Mini template used with {{>act}}
 Handlebars.registerPartial('act', '<section>{{TITLE}}</section>'+
-  '{{#each SCENE}}{{TITLE}}{{/each}}');
+  '{{#list SCENE}}{{TITLE}}{{/list}}');
 
 // Normal helper: doesn't need a closing tag
 // {{link 'Cow', mooURL}}
@@ -46,12 +51,12 @@ Handlebars.registerHelper('link', function(text, url) {
 // {{#actPrinter arg1 arg2}}{{stuffOnInside}} {{blahBlah}}{{/actPrinter}}
 // options.fn() to render the stuff inside of it
 // options.inverse() to render the else clause.... don't think about this
-Handlebars.registerHelper('actPrinter', function(arg1, arg2, options) {
+Handlebars.registerHelper('list', function(items, options) {
   var out = "<ul>";
 
   for(var i=0, l=items.length; i<l; i++) {
     // options.fn() will process {{stuffOnInside}}
-    out = out + "<li>" + options.fn(items[i]) + "</li>";
+    out = out + "<a class='scene'><li>" + options.fn(items[i]) + "</li></a>";
   }
 
   // whatever you return gets printed!
