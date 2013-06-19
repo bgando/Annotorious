@@ -1,7 +1,7 @@
 var WorkView = Backbone.View.extend({
   events: {
-    'click.titleNav': "renderActs",
-    'click.scene' : "renderAct"
+    'click .scene' : "renderScene",
+    'click .titleNav': "renderActs", 
   },
 
   templateActs: Handlebars.compile(
@@ -9,12 +9,17 @@ var WorkView = Backbone.View.extend({
     '<article>{{#each ACT}}{{>act}}{{/each}}</article>'
   ),
 
-  // templateAct: Handlebars.compile(
-
-  // ),
+  templateScene: Handlebars.compile(
+    '<h3>{{ title }}</h3>'
+  ),
 
   templateTitle: Handlebars.compile('<a class="titleNav">{{ title }}</a>'),
   templateNextAct: Handlebars.compile('<a href=/works/{{ _id }}/{{ ACT }} Next Act</a>'),
+
+  renderTitle: function() {
+    this.$el.append(this.templateTitle(this.model.toJSON()));
+    return this;
+  },
 
   renderActs: function(){
     var model = this.model.fetch({
@@ -25,16 +30,16 @@ var WorkView = Backbone.View.extend({
     // this.$el.append(this.templateNextAct({act: this.collection.act + 1}));
   },
 
-  renderTitle: function() {
-    this.$el.append(this.templateTitle(this.model.toJSON()));
-    return this;
+  renderScene: function (){
+    console.log('rendering scene');
+    // $('#content').append(this.templateScene(this.model.toJSON()));
   }
 });
 
 
 // Partial: Mini template used with {{>act}}
 Handlebars.registerPartial('act', '<section>{{TITLE}}</section>'+
-  '{{#list SCENE}}{{TITLE}}{{/list}}');
+  '{{#accordianList SCENE}}{{TITLE}}{{/accordianList}}');
 
 // Normal helper: doesn't need a closing tag
 // {{link 'Cow', mooURL}}
@@ -51,14 +56,25 @@ Handlebars.registerHelper('link', function(text, url) {
 // {{#actPrinter arg1 arg2}}{{stuffOnInside}} {{blahBlah}}{{/actPrinter}}
 // options.fn() to render the stuff inside of it
 // options.inverse() to render the else clause.... don't think about this
-Handlebars.registerHelper('list', function(items, options) {
-  var out = "<ul>";
+Handlebars.registerHelper('accordianList', function(items, options) {
+
+  var out = '<div class="accordion" id="accordion2">';
 
   for(var i=0, l=items.length; i<l; i++) {
     // options.fn() will process {{stuffOnInside}}
-    out = out + "<a class='scene'><li>" + options.fn(items[i]) + "</li></a>";
+    out = out + ('<div class="accordion-group">
+      <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse' + i + '">'
+        + options.fn(items[i]) +
+        '</a>
+      </div>
+      <div id="collapse' + i + '" class="accordion-body collapse in">
+        <div class="accordion-inner">
+        </div>
+      </div>
+    </div>');
   }
 
   // whatever you return gets printed!
-  return out + "</ul>";
+  return out + "</div>";
 });
