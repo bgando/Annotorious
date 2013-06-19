@@ -42,6 +42,7 @@ module.exports = {
     });
     }
 	},
+  
 	findById: function (req, res) {
     return AnnotationModel.findById(req.params.id, function (err, annotation) {
       if (!err) {
