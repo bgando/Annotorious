@@ -75,6 +75,11 @@
           </div>
         </div><!--/span-->
           <div id='content'>
+            <p>Lorem ipsum dolor sit amet, duo alia signiferumque an. In amet exerci utroque eam. Volumus torquatos est ut, sea cu suscipit legendos neglegentur, no choro prompta virtute eum. Debet labores vix in, in vis meliore consectetuer. Graece discere sensibus eu cum, pro eu nemore fuisset. At mei dicunt accommodare, nullam option ocurreret id vim, purto inimicus torquatos ex sed.
+
+            Nec at legere theophrastus. Eu per nonumes insolens euripidis, hinc dicant soleat cu vel. Mei elitr malorum fierent ex, an pri error fabellas maiestatis. Sint solet eum te, eu pericula adolescens inciderint sea. In mutat delenit corrumpit sit.
+
+            Noster corpora dolores his no, in usu minim quodsi. Iriure interesset ullamcorper ut quo, nullam diceret expetenda mei no. Ut prima soleat vituperata sea. Eum nostro option invidunt ea. Sit cu error iuvaret. Ad pri labitur tibique, mollis doctus ad mel.</p>
           </div>
 
       </div>
@@ -89,6 +94,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="http://code.jquery.com/jquery-1.10.1.js"></script>
+    <script src= "http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
     <script src="http://underscorejs.org/underscore.js"></script>
     <script src="http://backbonejs.org/backbone.js"></script>
     <script src="lib/bootstrap/js/bootstrap.js"></script>
@@ -97,25 +103,25 @@
 
 
     <script> 
-    // $(function(){
-    //   $('document.body').annotator();
+    $(function(){
+      $(document.body).annotator();
 
-    //   // Annotator.Plugin.HelloWorld = (function() {
+      Annotator.Plugin.HelloWorld = (function() {
 
-    //   // function HelloWorld(element, options) {
-    //   //   this.element = element;
-    //   //   this.options = options;
-    //   //   console.log("Hello World!");
-    //   // }
+      function HelloWorld(element, options) {
+        this.element = element;
+        this.options = options;
+        console.log("Hello World!");
+      }
 
-    //   // HelloWorld.prototype.pluginInit = function() {
-    //   //   console.log("Initialized with annotator: ", this.annotator);
-    //   // };
+      HelloWorld.prototype.pluginInit = function() {
+        console.log("Initialized with annotator: ", this.annotator);
+      };
 
-    //   //   return HelloWorld;
-    //   // })();
+        return HelloWorld;
+      })();
 
-    // });
+    });
    </script>
 
 
