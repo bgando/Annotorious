@@ -1,3 +1,6 @@
+var mongoose = require('mongoose');
+var Annotation = mongoose.model('Annotation');
+
 module.exports = {
 
   api: function (req, res) {
@@ -5,7 +8,7 @@ module.exports = {
   },
 
 	search: function(req, res) {
-    var query = AnnotationModel.find({'uri': req.query.uri }); 
+    var query = Annotation.find({'uri': req.query.uri }); 
 
     switch (req.query.mode) {
     case 'user':
@@ -44,7 +47,7 @@ module.exports = {
 	},
   
 	findById: function (req, res) {
-    return AnnotationModel.findById(req.params.id, function (err, annotation) {
+    return Annotation.findById(req.params.id, function (err, annotation) {
       if (!err) {
       return res.send(annotation);
       } else {
@@ -54,7 +57,7 @@ module.exports = {
 	},
 
   list: function (req, res) {
-    return AnnotationModel.find(function (err, annotations) {
+    return Annotation.find(function (err, annotations) {
       if (!err) {
        return res.send(annotations);
       } else {
@@ -67,7 +70,7 @@ module.exports = {
   var annotation;
   console.log("POST: ");
   console.log(req.body);
-  annotation = new AnnotationModel({
+  annotation = new Annotation({
     user: req.body.user,
     username: req.body.username,
     consumer: "annotationstudio.mit.edu",
@@ -99,7 +102,7 @@ module.exports = {
 	},
 
   update: function (req, res) {
-    return AnnotationModel.findById(req.params.id, function (err, annotation) {
+    return Annotation.findById(req.params.id, function (err, annotation) {
       annotation._id = req.body._id;
       annotation.id = req.body._id;
       annotation.user = req.body.user;
@@ -130,7 +133,7 @@ module.exports = {
   }, 
 
   delete: function(req, res) {
-     return AnnotationModel.findById(req.params.id, function (err, annotation) {
+     return Annotation.findById(req.params.id, function (err, annotation) {
       return annotation.remove(function (err) {
         if (!err) {
           console.log("removed");

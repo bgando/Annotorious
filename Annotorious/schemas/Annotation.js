@@ -46,4 +46,4 @@ var Annotation = new Schema({
     }
 });
 
-module.exports = Ranges, Shape, Annotation;
+module.exports = Annotation;
