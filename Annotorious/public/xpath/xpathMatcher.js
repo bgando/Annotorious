@@ -18,16 +18,6 @@
     }
   };
 
-  // var highlight = function (element, start, end) { 
-  //   var str = element.innerHTML;
-  //   str = str.substr(0, start) +
-  //   '<span class="hilite" style="color:red">' + 
-  //   str.substr(start, end - start + 1) +
-  //   '</span>' +
-  //   str.substr(end + 1);
-  //   element.innerHTML = str;
-  // }
-
     var extractXpathPInfo = function(start, end) {
       var pNums = [];
       var firstP = start.search('p');
@@ -147,5 +137,9 @@
       return nodeArray;
     }
 
-    returnAnnotations("/div[1]/p[1]", "/div[1]/p[1]","DUKE");
+    returnAnnotations("/div[1]/p[1]", "/div[1]/p[1]","DUKE", "testing 1 2 3");
+
+    $('.annotated').on('hover', function(){
+      console.log(this.getAttribute('data'));
+    });
      
