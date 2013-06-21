@@ -4950,7 +4950,7 @@ SONG.
     <script src="lib/jquery.xpath.js"></script>
     <script src="lib/XPath.js"></script>
 
-    <!-- // <script src="xpath/xpathMatcher.js"></script> -->
+    <script src="xpath/xpathMatcher.js"></script>
 
 
     <script src="lib/bootstrap/js/bootstrap.js"></script>
@@ -4963,119 +4963,4 @@ SONG.
     <script src="backbone/views/workView.js"></script>
 
     <script>
-
-    var extractXpathDivInfo = function(start, end) {
-      var divNums = [];
-      var divEnd = start.search(']');
-      var divNumStart = start.slice(5,divEnd);
-      divNums.push(divNumStart);
-
-      divEnd = end.search(']');
-      divNumEnd = end.slice(5, divEnd);
-      divNums.push(divNumEnd);
-
-      var divRange = divNumEnd - divNumStart;
-      divNums.push(divRange);
-
-      if (divNums.length < 2) {
-        console.log("error parsing divs for %s and %s", start, end);
-      } else {
-        return divNums;
-      }
-    };
-
-    var extractXpathPInfo = function(start, end) {
-      var pNums = [];
-      var firstP = start.search('p');
-      pNums.push(start.slice(firstP));
-      pNums.push(pRawNum(start, firstP));
-      
-      var lastP = end.search('p');
-      pNums.push(end.slice(lastP));
-      pNums.push(pRawNum(end, lastP));
-
-      // console.log(pNums, "pnum");
-      return pNums
-    };
-
-    var pRawNum = function(path, num) {
-      var rawNum = path.slice((num + 2), (num + 3));
-        // console.log(rawNum, "rawNum");
-      return (rawNum);
-    };
-
-    var formatXpathsArray = function(xpathStart, xpathEnd, divNums) {
-      var xpathArray = [];
-      // console.log(divNums[1], 'divNums');
-
-      var startLoop = parseInt(divNums[0]);
-      var endLoop = parseInt(divNums[1]);
-
-      for (var i = startLoop; i < endLoop + 1; i++) {
-        xpathArray.push('//div[' + i + ']');
-        // console.log(xpathArray);
-      }
-
-      var pNums = extractXpathPInfo(xpathStart,xpathEnd);
-      // console.log(pNums);
-
-      xpathArray[0] += pNums[0];
-
-      xpathArray[xpathArray.length - 1] += pNums[1];
-
-      var formatInfo = {
-        "xpaths" : xpathArray, 
-        "pInfo": pNums
-      };
-      return formatInfo;
-    }
-
-
-
-    returnAnnotations = function(xpathStart, xpathEnd, quote) {
-      
-      // returns an array that follows this format [startingDiv, endingDiv, divRange]
-      var divNums = extractXpathDivInfo(xpathStart, xpathEnd);
-      console.log(divNums);
-
-      if(divNums[2] === 0) {
-        var selectNode = $('body').xpath('/' + xpathStart); 
-        // console.log('selectedNode: ', selectNode);
-
-        var selectText = (selectNode[0].innerText);
-        // console.log(selectText, 'selectedText');
-
-        var charStart = selectText.search(quote); //add regex
-        var charEnd = charStart + quote.length;
-        // console.log(charEnd, "quote.length");
-
-        return selectText.slice(charStart, charEnd);
-
-      } else { //if the selection spans multiple divs
-        var formatInfo = formatXpathsArray(xpathStart, xpathEnd, divNums);
-        var countFirstP = formatInfo.pInfo[1];
-        var countLastP = formatInfo.pInfo[3];
-        var xpathCount = formatInfo.xpaths.length
-        console.log(xpathCount);
-        var textConcat;
-
-        for (var i = 0; i < xpathCount; i++) {
-          if (i = 0) {
-            console.log('first', formatInfo.xpaths[i]);
-          }
-
-          if (i = xpathCount) {
-            console.log('last', formatInfo.xpaths[i]);
-          }
-          console.log(formatInfo.xpaths[i]);
-           // textConcat += (formatInfo.xpaths[i].innerText);
-
-          
-        }
-        // return textConcat
-      }
-
-    }
-     
-
     </script>
