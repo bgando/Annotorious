@@ -5,8 +5,9 @@ var WorkView = Backbone.View.extend({
   },
 
   templateActs: Handlebars.compile(
-    '<h3>{{ title }}</h3>' + 
-    '<ul class="nav nav-pills nav-stacked">{{#each ACT}}{{>act}}{{/each}}</ul>'
+    // '<h3>{{ title }}</h3>' + 
+    '{{{ html }}}'
+    // '<ul class="nav nav-pills nav-stacked">{{#each ACT}}{{>act}}{{/each}}</ul>'
   ),
 
   templateScene: Handlebars.compile(
@@ -23,7 +24,8 @@ var WorkView = Backbone.View.extend({
   renderActs: function(){
     var model = this.model.fetch({
       success: function(model, response, options) {    
-        $('#content').html(this.templateActs(this.model.toJSON()));
+        $('#content').html(this.templateActs(this.model.attributes));
+        // $(document.head).preppend('<?xml version="1.0" encoding="ISO-8859-1"?>')
       }.bind(this)
     });
   },

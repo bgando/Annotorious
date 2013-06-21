@@ -4,21 +4,21 @@ var lessMiddleware = require('less-middleware');
 var jwt = require('jwt-simple');
 
 // CORS
-// var allowCrossDomain = function(req, res, next) {
-//     res.header('Access-Control-Allow-Origin', '*');
-//     res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type, Location');
-//     res.header('Access-Control-Allow-Headers', 'Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With');
-//     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-//     res.header('Access-Control-Max-Age', '86400');
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type, Location');
+    res.header('Access-Control-Allow-Headers', 'Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.header('Access-Control-Max-Age', '86400');
 
-//     // intercept OPTIONS method
-//     if ('OPTIONS' == req.method) {
-//      res.send(200);
-//     }
-//     else {
-//      next();
-//     }
-// };
+    // intercept OPTIONS method
+    if ('OPTIONS' == req.method) {
+     res.send(200);
+    }
+    else {
+     next();
+    }
+};
 
 module.exports = function(app) {
   // Configuration for all environments
@@ -27,12 +27,14 @@ module.exports = function(app) {
   app.engine('html', require('ejs').renderFile);
   app.use(express.favicon());
   app.use(express.logger('dev'));
-  // app.use(allowCrossDomain);
+  app.use(allowCrossDomain);
   app.use(express.bodyParser());
   app.use(express.cookieParser('SecretAgentShakespeare'));
   app.use(express.session());
   app.use(app.router);
   app.use(express.static(path.join(__dirname, '..', 'public')));
+
+  
 
   // Development configuration
   if (app.get('env') === 'development') {
