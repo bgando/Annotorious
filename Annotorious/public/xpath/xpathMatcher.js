@@ -1,145 +1,118 @@
-  var extractXpathDivInfo = function(start, end) {
-    var divNums = [];
-    var divEnd = start.search(']');
-    var divNumStart = start.slice(5,divEnd);
-    divNums.push(divNumStart);
-
-    divEnd = end.search(']');
-    divNumEnd = end.slice(5, divEnd);
-    divNums.push(divNumEnd);
-
-    var divRange = divNumEnd - divNumStart;
-    divNums.push(divRange);
-
-    if (divNums.length < 2) {
-      console.log("error parsing divs for %s and %s", start, end);
-    } else {
-      return divNums;
-    }
+var xpathCoordinates = function(start, end) {
+  var divNums = {
+    range: null,
+    start: null,
+    end: null
   };
 
-    var extractXpathPInfo = function(start, end) {
-      var pNums = [];
-      var firstP = start.search('p');
-      pNums.push(start.slice(firstP));
-      pNums.push(pRawNum(start, firstP));
-      
-      var lastP = end.search('p');
-      pNums.push(end.slice(lastP));
-      pNums.push(pRawNum(end, lastP));
+  // Matches a pair of xpath start/end coordinates; e.g.
+  // "/div[248]/p[2]" matches ['248', '2']
+  var regex = /(?!\[)[0-9]+(?!\])*/g;
+  divNums.start = start.match(regex);
+  divNums.end = end.match(regex);
 
-      // console.log(pNums, "pnum");
-      return pNums
-    };
+  //parsing integers
+  for(var i = 0; i < divNums.start.length; i++) {
+    divNums.start[i] = Number(divNums.start[i]);
+    divNums.end[i] = Number(divNums.end[i]);
+  }
 
-    var pRawNum = function(path, num) {
-      var rawNum = path.slice((num + 2), (num + 3));
-        // console.log(rawNum, "rawNum");
-      return (rawNum);
-    };
+  divNums.range = divNums.end[0] - divNums.start[0];
 
-    var formatXpathsArray = function(xpathStart, xpathEnd, divNums) {
-      var xpathArray = [];
-      // console.log(divNums[1], 'divNums');
+  if (divNums.range === null) {
+    console.log("error parsing divs for %s and %s", start, end);
+  } else {
+    return divNums;
+  }
+};
 
-      var startLoop = parseInt(divNums[0]);
-      var endLoop = parseInt(divNums[1]);
 
-      for (var i = startLoop; i < endLoop + 1; i++) {
-        xpathArray.push('//div[' + i + ']/');
-        // console.log(xpathArray);
-      }
+var formatXpathsArray = function(xpathStart, xpathEnd, divNums) {
+  var xpathArray = [];
 
-      var pNums = extractXpathPInfo(xpathStart,xpathEnd);
-      // console.log(pNums);
+  for( var i = 0; i < divNums.length; i++ ) {
+    divNums[i] = Number(divNums[i]);
+    console.log(divNums[i]);
+  }
+  console.log(divNums[1], 'divNums1', divNums[2], '2');
 
-      xpathArray[0] += pNums[0];
+  for (var i = startLoop; i < endLoop + 1; i++) {
+    xpathArray.push('//div[' + i + ']/');
+    // console.log(xpathArray);
+  }
 
-      xpathArray[xpathArray.length - 1] += pNums[1];
+  var pNums = extractXpathPInfo(xpathStart,xpathEnd);
+  // console.log(pNums);
 
-      var formatInfo = {
-        "xpaths" : xpathArray, 
-        "pInfo": pNums
-      };
-      return formatInfo;
-    }
+  xpathArray[0] += pNums[0];
 
-  var returnAnnotations = function(xpathStart, xpathEnd, quote, annotation) {
-    console.log('running');
-    
-    // returns an array that follows this format [startingDiv, endingDiv, divRange]
-    var divNums = extractXpathDivInfo(xpathStart, xpathEnd);
-    // console.log(divNums);
+  xpathArray[xpathArray.length - 1] += pNums[1];
 
-    if(divNums[2] === 0) {
-
-      var selectNode = $('body').xpath('/' + xpathStart); 
-      // console.log('selectedNode: ', selectNode);
-
-      var selectText = selectNode[0].innerHTML;
-
-      // console.log(selectText, 'selectedText');
-
-      var charStart = selectText.search(quote); //add regex
-      var charEnd = charStart + quote.length;
-      var highlightedText = "<strong><span class='annotated' data='"+ annotation + "'>" + quote + "</span></strong>"
-
-      var newText = selectText.replace(quote, highlightedText);
-      console.log(newText);
-
-      selectNode[0].innerHTML = newText;
-
-      // console.log(charEnd, "quote.length");
-      // var test = selectNode[0].replaceData(charStart, charEnd, "YES");
-      // document.write(test.nodeValue);
-
-      // selectText.slice(charStart, charEnd).bold();
-
-      return true;
-
-      // highlight(selectNode, charStart, charEnd);
-
-    } else { //if the selection spans multiple divs
-       return returnMultilineAnnotations(xpathStart, xpathEnd, quote, divNums)
-
-    }
-      // return textConcat
+  var formatInfo = {
+    "xpaths" : xpathArray, 
+    "pInfo": pNums
   };
+  return formatInfo;
+}
 
-    var returnMultilineAnnotations = function(xpathStart, xpathEnd, quote, divNums) {
+var returnAnnotations = function(xpathStart, xpathEnd, quote, annotation) {
 
-      var formatInfo = formatXpathsArray(xpathStart, xpathEnd, divNums);
-      var xpathArray = formatInfo.xpaths;
-      var countFirstP = formatInfo.pInfo[1];
-      var countLastP = formatInfo.pInfo[3];
-      var xpathCount = formatInfo.xpaths.length
-      // console.log(xpathCount);
+  //Returns an object that parses the xpath coordinates and range of divs
+  //xpathCoordinates("/div[248]/p[2]", "/div[250]/p[2]") returns
+  //divNums = {"start": [248,2], "end": [250,2], "range":2 }
+  var divNums = xpathCoordinates(xpathStart, xpathEnd);
+  console.log(divNums, 'divnums');
 
-      var nodeArray = []
+  if(divNums.range === 0 && divNums.start[1] === divNums.end[1]) {
+    console.log("%s only spans one line", quote);
 
-      for (var i = 0; i < xpathCount; i++) {
-        console.log("processing node %d", i)
-        nodeArray.push($('body').xpath(xpathArray[i]));
+    var selectText = $('body').xpath('/' + xpathStart)[0].innerHTML;
+    // var copySelectText = selectText
+    var highlightedText = "<strong><span class='annotated' data='" + annotation + "'>" + quote + "</span></strong>";
 
-        if (nodeArray[i].hasClass('shkspr-speech-body')) {
-          console.log("nodeArray %d has class shkspr-speech-body", i);
+    $('body').xpath('/' + xpathStart)[0].innerHTML = selectText.replace(quote, highlightedText);
+    return true;
+  }
 
-        } else if (nodeArray[i].hasClass('shkspr-speech')) {
-          console.log("nodeArray %d has class shkspr-speech", i);
+  //if the selection spans multiple divs
+  console.log("%s spans more than one line", quote);
 
-        } else if (nodeArray[i].hasClass('shkspr-speech-speaker')) {
-          console.log("nodeArray %d has class shkspr-speech-speaker", i);
+  return returnMultilineAnnotations(xpathStart, xpathEnd, quote, annotation, divNums);
+  // return textConcat
+};
 
-        } else if (nodeArray[i].hasClass('shkspr-stagedir')) {
-          console.log("nodeArray %d has class shkspr-stagedir", i);
-        }
-      };
-      return nodeArray;
+var returnMultilineAnnotations = function(xpathStart, xpathEnd, quote, annotation, divNums) {
+  var formatInfo = formatXpathsArray(xpathStart, xpathEnd, divNums);
+  var countFirstParagraph = formatInfo.pInfo[1];
+  var countLastParagraph = formatInfo.pInfo[3];
+  console.log(formatInfo.xpaths.length);
+  var nodeArray = [];
+
+  for (var i = 0; i < formatInfo.xpaths.length; i++) {
+    console.log("processing node %d", i)
+    nodeArray.push($('body').xpath(formatInfo.xpaths[i]));
+
+    if (nodeArray[i].hasClass('shkspr-speech-body')) {
+      console.log("nodeArray %d has class shkspr-speech-body", i);
+
+    } else if (nodeArray[i].hasClass('shkspr-speech')) {
+      console.log("nodeArray %d has class shkspr-speech", i);
+
+    } else if (nodeArray[i].hasClass('shkspr-speech-speaker')) {
+      console.log("nodeArray %d has class shkspr-speech-speaker", i);
+
+    } else if (nodeArray[i].hasClass('shkspr-stagedir')) {
+      console.log("nodeArray %d has class shkspr-stagedir", i);
     }
+  };
+  return nodeArray;
+}
 
-    returnAnnotations("/div[1]/p[1]", "/div[1]/p[1]","DUKE", "testing 1 2 3");
+returnAnnotations("/div[1]/p[1]", "/div[1]/p[1]","DUKE", "testing 1 2 3");
 
-    $('.annotated').on('hover', function(){
-      console.log(this.getAttribute('data'));
-    });
-     
+$('.annotated').on('hover', function(){
+  console.log(this.getAttribute('data'));
+});
+ 
+// "Here, again, is the theme of reason or judgment being swayed by love-- Lysander, ironically enough, claims to have it now that he's been bewitched by fairy juice. "
+// .match(/[^"](?:\s*)____???___(?:\s*)[^"]/)
