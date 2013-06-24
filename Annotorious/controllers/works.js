@@ -8,8 +8,9 @@ module.exports.list = function(req, res){
   Play.find({}, function (err, plays) {
     var works = [];
     plays.forEach(function(play) {
-      works.push({title : play.TITLE, _id: play._id})
+      works.push({title : play.title, _id: play._id})
     })
+    console.log(works);
     res.json(works);
    });
 };
@@ -17,7 +18,7 @@ module.exports.list = function(req, res){
 module.exports.findById = function(req, res) {
 
   var query = Play.findById(req.params.id, function(err, resp) {
-    console.log(resp, "resp");
+    // console.log(resp, "resp");
     res.json(resp);
   });
 };

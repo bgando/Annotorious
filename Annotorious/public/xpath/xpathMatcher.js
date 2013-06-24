@@ -1,5 +1,12 @@
+//the xpaths are relative to the format of the page. To adjust these paths for future iterations
+//of the websites, input the xpath formats to account for the difference. To use this on the raw HTML,
+//simply set xpathPrefix to '/' 
+
+var xpathPrefix = '//div[2]/div/div[2]/div[2]'
+// var xpathPrefix = '/';
+
 var xpathCoordinates = function(start, end) {
-  var divNums = {
+  var xpathCoords= {
     range: null,
     start: null,
     end: null
@@ -8,111 +15,77 @@ var xpathCoordinates = function(start, end) {
   // Matches a pair of xpath start/end coordinates; e.g.
   // "/div[248]/p[2]" matches ['248', '2']
   var regex = /(?!\[)[0-9]+(?!\])*/g;
-  divNums.start = start.match(regex);
-  divNums.end = end.match(regex);
+  xpathCoords.start = start.match(regex);
+  xpathCoords.end = end.match(regex);
 
   //parsing integers
-  for(var i = 0; i < divNums.start.length; i++) {
-    divNums.start[i] = Number(divNums.start[i]);
-    divNums.end[i] = Number(divNums.end[i]);
+  for(var i = 0; i < xpathCoords.start.length; i++) {
+    xpathCoords.start[i] = Number(xpathCoords.start[i]);
+    xpathCoords.end[i] = Number(xpathCoords.end[i]);
   }
 
-  divNums.range = divNums.end[0] - divNums.start[0];
+  xpathCoords.range = xpathCoords.end[0] - xpathCoords.start[0];
 
-  if (divNums.range === null) {
+  if (xpathCoords.range === null) {
     console.log("error parsing divs for %s and %s", start, end);
   } else {
-    return divNums;
+    return xpathCoords;
   }
 };
 
-
-var formatXpathsArray = function(xpathStart, xpathEnd, divNums) {
-  var xpathArray = [];
-
-  for( var i = 0; i < divNums.length; i++ ) {
-    divNums[i] = Number(divNums[i]);
-    console.log(divNums[i]);
-  }
-  console.log(divNums[1], 'divNums1', divNums[2], '2');
-
-  for (var i = startLoop; i < endLoop + 1; i++) {
-    xpathArray.push('//div[' + i + ']/');
-    // console.log(xpathArray);
-  }
-
-  var pNums = extractXpathPInfo(xpathStart,xpathEnd);
-  // console.log(pNums);
-
-  xpathArray[0] += pNums[0];
-
-  xpathArray[xpathArray.length - 1] += pNums[1];
-
-  var formatInfo = {
-    "xpaths" : xpathArray, 
-    "pInfo": pNums
-  };
-  return formatInfo;
-}
 
 var returnAnnotations = function(xpathStart, xpathEnd, quote, annotation) {
 
+  var xpath = xpathPrefix;
+
   //Returns an object that parses the xpath coordinates and range of divs
   //xpathCoordinates("/div[248]/p[2]", "/div[250]/p[2]") returns
-  //divNums = {"start": [248,2], "end": [250,2], "range":2 }
-  var divNums = xpathCoordinates(xpathStart, xpathEnd);
-  console.log(divNums, 'divnums');
+  //xpathCoords = {"start": [248,2], "end": [250,2], "range":2 }
+  var xpathCoords= xpathCoordinates(xpathStart, xpathEnd);
+  // console.log xpathCoords  xpathCoords
 
-  if(divNums.range === 0 && divNums.start[1] === divNums.end[1]) {
+  if (xpathCoords.range === 0 && xpathCoords.start[1] === xpathCoords.end[1]) {
     console.log("%s only spans one line", quote);
 
-    var selectText = $('body').xpath('/' + xpathStart)[0].innerHTML;
+    var selectText = $('body').xpath(xpath + xpathStart)[0].innerHTML;
     // var copySelectText = selectText
     var highlightedText = "<strong><span class='annotated' data='" + annotation + "'>" + quote + "</span></strong>";
+    console.log(selectText);
+    $('body').xpath(xpath + xpathStart)[0].innerHTML = selectText.replace(quote, highlightedText);
+    return true;
 
-    $('body').xpath('/' + xpathStart)[0].innerHTML = selectText.replace(quote, highlightedText);
+  } else {
+     //if the selection spans multiple divs
+    console.log("%s spans more than one line", quote);
+    var strS, strE = 9
+
+    // var textRange = $('body').xpath("/*//div[position() >=" + xpathCoords.start[0] + "and not(position() > " + xpathCoords.end[0] + ")]");
+    if  (xpathCoords.start[1] === 1) {
+      strS = 4;
+    } else if  (xpathCoords.end[1] === 1) {
+      strE = 4
+    }
+
+    var startQuote = $('body').xpath(xpath + '/div[' + xpathCoords.start[0] + ']/p[' + xpathCoords.start[1] + ']');  
+    var newQuote = "<strong><span class='annotated data'" + annotation + "'>" + quote.slice(0,strS);
+    var hightlightText = startQuote[0].innerHTML.replace(quote.slice(0,strS), newQuote );
+    console.log(startQuote[0].innerHTML = hightlightText);
+
+    var endQuote = $('body').xpath(xpath + '/div[' + xpathCoords.end[0] + ']/p[' + xpathCoords.end[1] + ']');
+    newQuote = quote.slice((quote.length - strE)) + "</span></strong>"
+    hightlightText = endQuote[0].innerHTML.replace(quote.slice(0,strE), newQuote );
+    console.log(hightlightText, "highlight")
+    endQuote[0].innerHTML = hightlightText;
     return true;
   }
 
-  //if the selection spans multiple divs
-  console.log("%s spans more than one line", quote);
-
-  return returnMultilineAnnotations(xpathStart, xpathEnd, quote, annotation, divNums);
-  // return textConcat
 };
 
-var returnMultilineAnnotations = function(xpathStart, xpathEnd, quote, annotation, divNums) {
-  var formatInfo = formatXpathsArray(xpathStart, xpathEnd, divNums);
-  var countFirstParagraph = formatInfo.pInfo[1];
-  var countLastParagraph = formatInfo.pInfo[3];
-  console.log(formatInfo.xpaths.length);
-  var nodeArray = [];
 
-  for (var i = 0; i < formatInfo.xpaths.length; i++) {
-    console.log("processing node %d", i)
-    nodeArray.push($('body').xpath(formatInfo.xpaths[i]));
+// returnAnnotations("/div[1]/p[1]", "/div[1]/p[1]","DUKE", "testing 1 2 3");
 
-    if (nodeArray[i].hasClass('shkspr-speech-body')) {
-      console.log("nodeArray %d has class shkspr-speech-body", i);
 
-    } else if (nodeArray[i].hasClass('shkspr-speech')) {
-      console.log("nodeArray %d has class shkspr-speech", i);
-
-    } else if (nodeArray[i].hasClass('shkspr-speech-speaker')) {
-      console.log("nodeArray %d has class shkspr-speech-speaker", i);
-
-    } else if (nodeArray[i].hasClass('shkspr-stagedir')) {
-      console.log("nodeArray %d has class shkspr-stagedir", i);
-    }
-  };
-  return nodeArray;
-}
-
-returnAnnotations("/div[1]/p[1]", "/div[1]/p[1]","DUKE", "testing 1 2 3");
-
-$('.annotated').on('hover', function(){
-  console.log(this.getAttribute('data'));
-});
  
-// "Here, again, is the theme of reason or judgment being swayed by love-- Lysander, ironically enough, claims to have it now that he's been bewitched by fairy juice. "
+// "Here, again, is the theme of reason or judgment being swayed by love-- 
+//Lysander, ironically enough, claims to have it now that he's been bewitched by fairy juice. "
 // .match(/[^"](?:\s*)____???___(?:\s*)[^"]/)

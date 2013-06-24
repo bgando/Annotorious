@@ -1,25 +1,23 @@
-$(function(){
-  $(document.body).annotator('addPlugin', 'Annotorious');
+var content = $('body').annotator();
 
-  Annotator.Plugin.Annotorious = (function() {
-    function Annotorious() {
-      console.log('working');
-      
-      }
-
-      Annotorious.prototype.pluginInit = function() {
-    console.log("Initialized with annotator: ", this.annotator);
-  };
-
-    return Annotorious;
-  })();
-
-  $(document.body).on('annotationCreated', function(annotation) {
-    console.log('created', annotation);
-  });
-  // Annotator.Plugin.Annotorious();
-
+content.annotator('addPlugin', 'Auth', {
+  tokenUrl: '/api'
 });
 
+content.annotator('addPlugin', 'Store', {
+  // The endpoint of the store on your server.
+  prefix: 'http://localhost:3000',
 
+  // Attach the uri of the current page to all annotations to allow search.
+  annotationData: {
+    'uri': 'http://localhost:3000/annotations/'
+  },
 
+  // This will perform a "search" action rather than "read" when the plugin
+  // loads. Will request the last 20 annotations for the current url.
+  // eg. /store/endpoint/search?limit=20&uri=http://this/document/only
+  loadFromSearch: {
+    'limit': 20,
+    'uri':  'http://localhost:3000/annotations/'
+  }
+});

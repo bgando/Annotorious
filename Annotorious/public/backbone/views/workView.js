@@ -1,82 +1,51 @@
 var WorkView = Backbone.View.extend({
-  events: {
-    'click .scene' : "renderScene",
-    'click .titleNav': "renderActs", 
+  initialize: function() {
+    this.model.on('renderWork', function(){
+      //TODO
+    })
+
   },
 
-  templateActs: Handlebars.compile(
-    // '<h3>{{ title }}</h3>' + 
+  events: {
+    'click .scene' : "renderScene",
+    'click .titleNav': "renderWork",
+    'hover .annotated' : "showAnnotation",
+    'createAnnotation body': "create"
+  },
+
+  create: function() {
+    console.log('create');
+  },
+
+  templateWork: Handlebars.compile(
     '{{{ html }}}'
-    // '<ul class="nav nav-pills nav-stacked">{{#each ACT}}{{>act}}{{/each}}</ul>'
   ),
 
-  templateScene: Handlebars.compile(
-    '<h3>{{ title }}</h3>'
-  ),
-
-  templateTitle: Handlebars.compile('<button class="titleNav btn btn-link">{{ title }}</button></n>'),
+  templateTitle: Handlebars.compile('<button class="titleNav btn btn-link">asdf</button></n>'),
 
   renderTitle: function() {
     this.$el.append(this.templateTitle(this.model.toJSON()));
     return this;
   },
 
-  renderActs: function(){
-    var model = this.model.fetch({
-      success: function(model, response, options) {    
-        $('#content').html(this.templateActs(this.model.attributes));
-        // $(document.head).preppend('<?xml version="1.0" encoding="ISO-8859-1"?>')
-      }.bind(this)
-    });
+  showAnnotation: function() {
+    console.log(this.data());
   },
 
-  renderScene: function (){
-    console.log('rendering scene');
-    // $('#content').append(this.templateScene(this.model.toJSON()));
-  }
-});
+  renderWork: function(){
+    var self = this;
+    var model = this.model.fetch({
+      success: function(model, response, options) {   
+        $('#content').html(self.templateWork(model.attributes)).bind(self);
+        console.log(self.templateWork(model.attributes))
+        console.log($('#content'))
+        this.loadAnnotations({uri: });
+      },
 
-
-// Partial: Mini template used with {{>act}}
-Handlebars.registerPartial('act', '<li>{{TITLE}}</li>'+
-  '{{#accordianList SCENE}}{{TITLE}}{{/accordianList}}');
-
-// Normal helper: doesn't need a closing tag
-// {{link 'Cow', mooURL}}
-Handlebars.registerHelper('link', function(text, url) {
-  text = Handlebars.Utils.escapeExpression(text);
-  url  = Handlebars.Utils.escapeExpression(url);
-
-  var result = '<a href="' + url + '">' + text + '</a>';
-
-  return new Handlebars.SafeString(result);
-});
-
-// Block helper: Function that does magic, passed arguments and options
-// {{#actPrinter arg1 arg2}}{{stuffOnInside}} {{blahBlah}}{{/actPrinter}}
-// options.fn() to render the stuff inside of it
-// options.inverse() to render the else clause.... don't think about this
-Handlebars.registerHelper('accordianList', function(items, options) {
-
-  var out = "<ul>"
-  // var out = '<div class="accordion" id="accordion2">';
-
-  for(var i=0, l=items.length; i<l; i++) {
-    var out = out + "<a href=# class='scene'><li>" + options.fn(items[i]) + "</li></a>"
-    // options.fn() will process {{stuffOnInside}}
-    // out = out + ('<div class="accordion-group">
-    //   <div class="accordion-heading">
-    //     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse' + i + '">'
-    //     + options.fn(items[i]) +
-    //     '</a>
-    //   </div>
-    //   <div id="collapse' + i + '" class="accordion-body collapse in">
-    //     <div class="accordion-inner">
-    //     </div>
-    //   </div>
-    // </div>');
+      error: function(err) {
+        console.log("Error rendering page:",err);
+      }
+    });
   }
 
-  // whatever you return gets printed!
-  return out + "</ul>";
 });

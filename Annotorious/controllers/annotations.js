@@ -71,9 +71,9 @@ module.exports = {
   console.log("POST: ");
   console.log(req.body);
   annotation = new Annotation({
-    user: req.body.user,
-    username: req.body.username,
-    consumer: "annotationstudio.mit.edu",
+    user: "user",
+    username: "username",
+    consumer: "consumer",
     annotator_schema_version: req.body.annotator_schema_version,
     created: Date.now(),
     updated: Date.now(),
@@ -105,14 +105,14 @@ module.exports = {
     return Annotation.findById(req.params.id, function (err, annotation) {
       annotation._id = req.body._id;
       annotation.id = req.body._id;
-      annotation.user = req.body.user;
-      annotation.username = req.body.username;
-      annotation.consumer = req.body.consumer;
+      annotation.user = "user";
+      annotation.username = "username";
+      annotation.consumer = "consumer";
       annotation.annotator_schema_version = req.body.annotator_schema_version;
       annotation.created = req.body.created;
       annotation.updated = Date.now();
       annotation.text = req.body.text;
-      annotation.uri = req.body.uri;
+      annotation.uri = req.body.test;
       annotation.quote = req.body.quote;
       annotation.tags = req.body.tags;
       annotation.groups = req.body.groups;
@@ -146,31 +146,3 @@ module.exports = {
   }
 };
 
-//auth
-
-function tokenOK (req, res, next) {
-    try {
-    var decoded = jwt.decode(req.header('x-annotator-auth-token'), secret);
-    if (inWindow(decoded)) {
-       console.log("Token in time window");
-    } 
-    else {
-       console.log("Token not in in time window.");
-    } 
-    next();
-    } catch (err) {
-       console.log("Error decoding token:");
-    console.log(err);
-    return res.send("There was a problem with your authentication token");
-    }
-};
-
-function inWindow (decoded, next) {
-    var issuedAt = decoded.issuedAt; 
-    var ttl = decoded.ttl; 
-    var issuedSeconds = new Date(issuedAt) / 1000; 
-    var nowSeconds = new Date().getTime() / 1000;    
-    var diff = ((nowSeconds - issuedSeconds)); 
-    var result = (ttl - diff); console.log("Time left on token: about " + Math.floor(result/(60*60)) + " hours.");
-    return ((result > 0) ? true : false);
-}
