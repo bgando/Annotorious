@@ -2,6 +2,8 @@ module.exports = function(app) {
 	var site = require('../controllers/site');
 	var works = require('../controllers/works');
 	var annotations = require('../controllers/annotations');
+	var jwt = require('jwt-simple');
+
 
 	app.get('/', site.index);
 
@@ -21,6 +23,7 @@ module.exports = function(app) {
 //auth
 
 function tokenOK (req, res, next) {
+
     try {
     var decoded = jwt.decode(req.header('x-annotator-auth-token'), secret);
     if (inWindow(decoded)) {

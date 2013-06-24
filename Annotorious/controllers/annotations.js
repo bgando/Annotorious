@@ -119,7 +119,7 @@ module.exports = {
       annotation.subgroups = req.body.subgroups;
       annotation.uuid = req.body.uuid;
       annotation.ranges = req.body.ranges;
-      annotation.permissions = req.body.permissions;
+      // annotation.permissions = req.body.permissions;
 
       return annotation.save(function (err) {
        if (!err) {

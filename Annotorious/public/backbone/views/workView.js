@@ -7,14 +7,7 @@ var WorkView = Backbone.View.extend({
   },
 
   events: {
-    'click .scene' : "renderScene",
     'click .titleNav': "renderWork",
-    'hover .annotated' : "showAnnotation",
-    'createAnnotation body': "create"
-  },
-
-  create: function() {
-    console.log('create');
   },
 
   templateWork: Handlebars.compile(
@@ -28,10 +21,6 @@ var WorkView = Backbone.View.extend({
     return this;
   },
 
-  showAnnotation: function() {
-    console.log(this.data());
-  },
-
   renderWork: function(){
     var self = this;
     var model = this.model.fetch({
@@ -39,7 +28,7 @@ var WorkView = Backbone.View.extend({
         $('#content').html(self.templateWork(model.attributes)).bind(self);
         console.log(self.templateWork(model.attributes))
         console.log($('#content'))
-        this.loadAnnotations({uri: });
+        this.loadAnnotations();
       },
 
       error: function(err) {
