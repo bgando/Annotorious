@@ -1,7 +1,7 @@
 Annotorious
 ===========
 
-Rap Genius for Shakespeare using an Express Server, MongoDb and Backbone with the AnnontateIt annotator plugin.
+"Rap Genius" for Shakespeare using an Express Server, MongoDb and Backbone with the AnnontateIt annotator plugin.
 
 Getting Started
 ===========
